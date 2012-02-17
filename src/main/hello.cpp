@@ -4,7 +4,7 @@
 
 int main()
 {
-   std::cout << murex::tests::greet() << std::endl;
+   std::cout << tests::greet() << std::endl;
 
    return 0;
 }

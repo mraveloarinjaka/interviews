@@ -4,11 +4,10 @@
 #include <utils/exports_config.hpp>
 #include <string>
 
-namespace murex {
 namespace tests {
 
-MUREX_TESTS_API const char *greet();
+TESTS_API const char *greet();
 
-} } // murex::tests
+} // tests
 
 #endif
