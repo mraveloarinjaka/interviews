@@ -1,11 +1,9 @@
 #include <greetings/greetings.hpp>
 
-#include <string>
-
 namespace murex {
 namespace tests {
 
-std::string greet()
+const char *greet()
 {
    return "Hello!";
 }
