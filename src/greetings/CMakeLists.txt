@@ -1,3 +1,5 @@
+ADD_DEFINITIONS(-DMUREX_TESTS_EXPORTS)
+
 file (
    GLOB_RECURSE
    source_files
@@ -10,5 +12,5 @@ file (
    ${CMAKE_SOURCE_DIR}/include/greetings/*.hpp	
 )
 
-add_library(greetings STATIC ${source_files} ${include_files})
+add_library(greetings SHARED ${source_files} ${include_files})
 
