@@ -1,4 +1,4 @@
-ADD_DEFINITIONS(-DTESTS_EXPORTS)
+add_definitions(-DTESTS_EXPORTS)
 
 file (
    GLOB_RECURSE
