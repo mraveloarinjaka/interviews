@@ -12,4 +12,5 @@ file (
 )
 
 add_library(transaction STATIC ${source_files} ${include_files})
+target_link_libraries(transaction sqlite)
 
