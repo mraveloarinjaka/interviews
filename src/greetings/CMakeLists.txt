@@ -1,4 +1,3 @@
-add_definitions(-DTESTS_EXPORTS)
 
 file (
    GLOB_RECURSE
@@ -12,6 +11,10 @@ file (
    ${CMAKE_SOURCE_DIR}/include/greetings/*.hpp	
 )
 
-add_library(greetings STATIC  ${source_files} ${include_files})
-add_library(greetings_shared SHARED ${source_files} ${include_files})
+if(${GENERATE_GREETINGS_SHARED_LIBRARY})
+   add_definitions(-DGENERATE_GREETINGS_SHARED_LIBRARY)
+   add_library(greetings SHARED ${source_files} ${include_files})
+else(${GENERATE_GREETINGS_SHARED_LIBRARY})
+   add_library(greetings STATIC  ${source_files} ${include_files})
+endif(${GENERATE_GREETINGS_SHARED_LIBRARY})
 
