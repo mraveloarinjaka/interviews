@@ -1,3 +1,7 @@
+if(${GENERATE_GREETINGS_SHARED_LIBRARY})
+   add_definitions(-DGENERATE_GREETINGS_SHARED_LIBRARY)
+endif(${GENERATE_GREETINGS_SHARED_LIBRARY})
+
 add_executable(hello hello.cpp)
 target_link_libraries(hello greetings)
 
