@@ -12,5 +12,6 @@ file (
    ${CMAKE_SOURCE_DIR}/include/greetings/*.hpp	
 )
 
-add_library(greetings SHARED ${source_files} ${include_files})
+add_library(greetings STATIC  ${source_files} ${include_files})
+add_library(greetings_shared SHARED ${source_files} ${include_files})
 
