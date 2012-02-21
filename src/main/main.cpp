@@ -1,8 +1,15 @@
 /** 
- * Main test
+ * =====================================================================================
+ *
+ *       Filename:  main.cpp
+ *
+ *    Description:  Test binary that checks whether contracts can be inserted into a database and read back
+ *
+ * =====================================================================================
  */
 
 #include <cstdlib>
+#include <iterator>
 #include <iostream>
 #include <sstream>
 
@@ -63,8 +70,14 @@ bool executeRequest(sqlite3 *db, char const *szRequest, ResultsSetCB callback = 
 }
 
 /** 
- * Populates database
+ * ===  FUNCTION  ======================================================================
+ *         Name:  setUpDatabase
+ *  Description:  Prepare the database for the test:
+ *                   _ if the contracts table exist, zap it
+ *                   _ if the contracts table does not exist, create it
+ * =====================================================================================
  */
+
 void setUpDatabase()
 {
    sqlite3 *db = 0;
@@ -75,7 +88,7 @@ void setUpDatabase()
    if(!errorRaised)
    {
       std::ostringstream request;
-      request << "create table if not exists CONTRACTS_DBF(M_REFERENCE double, M_SOURCE text)";
+      request << "create table if not exists CONTRACTS_DBF(M_REFERENCE double, M_SOURCE text, M_PARTY text)";
       errorRaised = executeRequest(db, request.str().c_str());
    }
    if(!errorRaised)
@@ -91,8 +104,12 @@ void setUpDatabase()
 }
 
 /**
- * Creates and serialize contracts
+ * ===  FUNCTION  ======================================================================
+ *         Name:  populateDatabase
+ *  Description:  Insert two contracts in the database
+ * =====================================================================================
  */
+
 void populateDatabase()
 {
    sqlite3 *db = 0;
@@ -105,6 +122,7 @@ void populateDatabase()
       ctransaction::Contract contract;   
 
       contract.setSource("portfolio");
+      contract.setParty("Citibank");
       errorRaised = contract.save(db);
    }
    if(!errorRaised)
@@ -112,6 +130,7 @@ void populateDatabase()
       ctransaction::Contract contract;   
 
       contract.setSource("very long portfolio");
+      contract.setParty("JP Morgan and Chase");
       errorRaised = contract.save(db);
    }
    if(db)
@@ -119,6 +138,14 @@ void populateDatabase()
       sqlite3_close(db);
    }
 }
+
+/** 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  checkDatabase
+ *  Description:  Executes a request to retrive all the contracts in the database.
+ *                The expected number should be 2: 2 contracts were inserted by the call to populateDatabase
+ * =====================================================================================
+ */
 
 struct SelectRequestData
 {
@@ -142,13 +169,6 @@ int readContracts(void *pData, int argc, char **argv, char **aszColumns)
    return 0;
 }
 
-/** 
- * Checks database
- *
- * Executes a request to retrive all the contracts in the database.
- * The expected number should be 2:
- *   _ 2 inserted by the call to populateDatabase (@see populateDatabase)
- */
 void checkDatabase()
 {
    sqlite3 *db = 0;
@@ -161,6 +181,7 @@ void checkDatabase()
    {
       std::ostringstream request;
       request << "select * from CONTRACTS_DBF";
+      std::cout << request.str() << std::endl;
       errorRaised = executeRequest(db, request.str().c_str(), readContracts, &result);
    }
    if(!errorRaised)
@@ -168,12 +189,61 @@ void checkDatabase()
       if(EXPECTED_NUMBER_OF_CONTRACTS != result.numberOfContracts)
       {
          std::cerr << "[FAILURE] Wrong number of contracts retrieved: " << result.numberOfContracts << " (" << EXPECTED_NUMBER_OF_CONTRACTS << " expected)." << std::endl;
-         std::cerr << "select * from CONTRACTS_DBF" << std::endl << result.result.str() << std::endl;
+         std::cerr << result.result.str() << std::endl;
       }
       else
       {
          std::cout << "[SUCCESS] Right number of contracts retrieved." << std::endl;
-         std::cout << "select * from CONTRACTS_DBF" << std::endl << result.result.str() << std::endl;
+         std::cout <<  result.result.str() << std::endl;
+      }
+   }
+   if(db)
+   {
+      sqlite3_close(db);
+   }
+}
+   
+/** 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  readFromDatabase
+ *  Description:  Assess that contracts can be read from the database
+ *                Execute a request to retrive all the contracts in the database and read the records into a list of contracts
+ *                The expected contracts number should be 2: 2 contracts were inserted by the call to populateDatabase
+ * =====================================================================================
+ */
+
+void readFromDatabase()
+{
+   sqlite3 *db = 0;
+   bool errorRaised = false;
+   ctransaction::Contracts contracts;
+
+   openDatabase(szDATABASE, &db);
+   errorRaised = NULL == db;
+   if(!errorRaised)
+   {
+      std::cout << "Read contracts from database" << std::endl;
+      errorRaised = ctransaction::Contract::loadAll(db, &contracts);
+   }
+   if(!errorRaised)
+   {
+      if(EXPECTED_NUMBER_OF_CONTRACTS != contracts.size())
+      {
+         std::cerr << "[FAILURE] Wrong number of contracts retrieved: " << contracts.size() << " (" << EXPECTED_NUMBER_OF_CONTRACTS << " expected)." << std::endl;
+         errorRaised = true;
+      }
+      else
+      {
+         std::cout << "[SUCCESS] Right number of contracts retrieved." << std::endl;
+      }
+
+      ctransaction::Contracts::const_iterator itBegin = contracts.begin();
+      ctransaction::Contracts::const_iterator itEnd = contracts.end();
+
+      for(ctransaction::Contracts::const_iterator it = itBegin; it != itEnd; ++it)
+      {
+         it->toStream(errorRaised ? std::cerr : std::cout);
       }
    }
    if(db)
@@ -186,11 +256,9 @@ void checkDatabase()
 
 int main()
 {
-   // Clean the database
    setUpDatabase();
-   // Create programatically two contracts and save them in the database
    populateDatabase();
-   // Check the content of the database
    checkDatabase();
+   readFromDatabase();
 }
 
