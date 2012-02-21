@@ -15,15 +15,7 @@ namespace
 {
 
 char const * szDATABASE = "test.db";
-const int EXPECTED_NUMBER_OF_CONTRACTS = 4;
-const int UNIQUE_ID = 1000;
-
-int getUniqueID()
-{
-   static int uniqueId = UNIQUE_ID;
-
-   return uniqueId++;
-}
+const int EXPECTED_NUMBER_OF_CONTRACTS = 2;
 
 void openDatabase(char const *szDatabase, sqlite3 **pdb)
 {
@@ -73,7 +65,7 @@ bool executeRequest(sqlite3 *db, char const *szRequest, ResultsSetCB callback = 
 /** 
  * Populates database
  */
-void populateDatabase()
+void setUpDatabase()
 {
    sqlite3 *db = 0;
    bool errorRaised = false;
@@ -92,30 +84,17 @@ void populateDatabase()
       request << "delete from CONTRACTS_DBF";
       errorRaised = executeRequest(db, request.str().c_str());
    }
-   if(!errorRaised)
-   {
-      std::ostringstream request;
-      request << "insert into CONTRACTS_DBF values(1, 'portfolio');" << std::endl;
-      request << "insert into CONTRACTS_DBF values(2, 'portfolio');" << std::endl;
-      errorRaised = executeRequest(db, request.str().c_str());
-   }
    if(db)
    {
       sqlite3_close(db);
    }
 }
 
-void logContractCreation(ctransaction::Contract const &contract)
-{
-   std::cout << "Contract (reference: " << contract.getReference() << ", source: " << contract.getSource() << ") created." << std::endl;
-}
-
 /**
  * Creates and serialize contracts
  */
-void createAndSaveContracts()
+void populateDatabase()
 {
-   ctransaction::Contract contract;   
    sqlite3 *db = 0;
    bool errorRaised = false;
 
@@ -123,16 +102,16 @@ void createAndSaveContracts()
    errorRaised = NULL == db;
    if(!errorRaised)
    {
-      contract.setReference(getUniqueID());
+      ctransaction::Contract contract;   
+
       contract.setSource("portfolio");
-      logContractCreation(contract);
       errorRaised = contract.save(db);
    }
    if(!errorRaised)
    {
-      contract.setReference(getUniqueID());
+      ctransaction::Contract contract;   
+
       contract.setSource("very long portfolio");
-      logContractCreation(contract);
       errorRaised = contract.save(db);
    }
    if(db)
@@ -167,9 +146,8 @@ int readContracts(void *pData, int argc, char **argv, char **aszColumns)
  * Checks database
  *
  * Executes a request to retrive all the contracts in the database.
- * The expected number should be 4:
+ * The expected number should be 2:
  *   _ 2 inserted by the call to populateDatabase (@see populateDatabase)
- *   _ 2 inserted by the call to createAndSaveContracts (@see createAndSaveContracts)
  */
 void checkDatabase()
 {
@@ -190,11 +168,12 @@ void checkDatabase()
       if(EXPECTED_NUMBER_OF_CONTRACTS != result.numberOfContracts)
       {
          std::cerr << "[FAILURE] Wrong number of contracts retrieved: " << result.numberOfContracts << " (" << EXPECTED_NUMBER_OF_CONTRACTS << " expected)." << std::endl;
-         std::cerr << result.result.str();
+         std::cerr << "select * from CONTRACTS_DBF" << std::endl << result.result.str() << std::endl;
       }
       else
       {
          std::cout << "[SUCCESS] Right number of contracts retrieved." << std::endl;
+         std::cout << "select * from CONTRACTS_DBF" << std::endl << result.result.str() << std::endl;
       }
    }
    if(db)
@@ -207,11 +186,11 @@ void checkDatabase()
 
 int main()
 {
-   // Inserts manually two contracts in the database
+   // Clean the database
+   setUpDatabase();
+   // Create programatically two contracts and save them in the database
    populateDatabase();
-   // Creates programatically two contracts and save them in the database
-   createAndSaveContracts();
-   // Checks the content of the database
+   // Check the content of the database
    checkDatabase();
 }
 
