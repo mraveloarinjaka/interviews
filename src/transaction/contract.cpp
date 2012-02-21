@@ -141,9 +141,8 @@ int loadContract(void *pvContracts, int argc, char **argv, char **szColumNames)
 
 } // namespace
  
-Contract::Contract() : m_reference(0)
+Contract::Contract() : m_reference(0), m_source(""), m_party("")
 {
-   m_source[0] = 0;
 }
 
 double Contract::getReference() const
