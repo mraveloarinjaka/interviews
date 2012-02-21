@@ -8,9 +8,6 @@ namespace transaction {
 
 class Contract;
 typedef std::vector<Contract> Contracts;
-const int CONTRACT_SOURCE_LEN = 11;
-const int CONTRACT_PARTY_LEN = 11;
-
 
 } } // tests::transaction
 
