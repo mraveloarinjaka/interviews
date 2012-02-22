@@ -1,46 +1,46 @@
 /**
  * =====================================================================================
  *
- *       Filename:  interface.cpp
+ *       Filename:  system.cpp
  *
- *    Description:  Class defining a interface to a downstream system
+ *    Description:  Class defining an interface to a downstream system
  *
  * =====================================================================================
  */
 
-#include <downstream/interface.hpp>
+#include <downstream/system.hpp>
 
 #include <sstream>
 
 namespace tests { namespace downstream {
 
-Interface *Interface::getInstance()
+System *System::getInstance()
 {
-   static Interface instance;
+   static System instance;
 
    return &instance;
 }
 
-struct Interface::PImpl
+struct System::PImpl
 {
    std::ostringstream m_stream;
 };
 
-std::ostream &Interface::getStream()
+std::ostream &System::getStream()
 {
    return m_implementation->m_stream;
 }
 
-std::string Interface::getHistory()
+std::string System::getHistory()
 {
    return m_implementation->m_stream.str();
 }
 
-Interface::Interface() : m_implementation(new PImpl)
+System::System() : m_implementation(new PImpl)
 {
 }
 
-Interface::~Interface()
+System::~System()
 {
    if(m_implementation)
    {
