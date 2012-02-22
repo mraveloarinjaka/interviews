@@ -12,6 +12,7 @@ file (
 )
 
 add_library(sqlite STATIC sqlite3.c)
+target_link_libraries(sqlite dl pthread)
 
 include_directories(${SQLITE_INCLUDE_DIRECTORY})
 add_executable(sqlite_shell shell.c ${include_files})
