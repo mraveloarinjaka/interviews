@@ -12,9 +12,14 @@ file (
    ${SQLITE_INCLUDE_DIRECTORY}/*.h	
 )
 
+if(UNIX)
 find_package(Threads)
 add_library(sqlite STATIC sqlite3.c)
 target_link_libraries(sqlite dl ${CMAKE_THREAD_LIBS_INIT})
+else(UNIX)
+add_library(sqlite STATIC sqlite3.c)
+target_link_libraries(sqlite)
+endif(UNIX)
 
 include_directories(${SQLITE_INCLUDE_DIRECTORY})
 add_executable(sqlite_shell shell.c ${include_files})
