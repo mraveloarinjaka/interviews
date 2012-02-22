@@ -3,6 +3,7 @@ if(CYGWIN OR MINGW)
    message("-- Platform: cygwin or mingw.")
 endif()
 
+
 set(SQLITE_INCLUDE_DIRECTORY ${CMAKE_SOURCE_DIR}/include/sqlite)
 
 file (
@@ -11,8 +12,9 @@ file (
    ${SQLITE_INCLUDE_DIRECTORY}/*.h	
 )
 
+find_package(Threads)
 add_library(sqlite STATIC sqlite3.c)
-target_link_libraries(sqlite dl pthread)
+target_link_libraries(sqlite dl ${CMAKE_THREAD_LIBS_INIT})
 
 include_directories(${SQLITE_INCLUDE_DIRECTORY})
 add_executable(sqlite_shell shell.c ${include_files})
