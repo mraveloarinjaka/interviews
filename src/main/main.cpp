@@ -204,7 +204,6 @@ void checkDatabase()
 }
    
 /** 
-/* 
  * ===  FUNCTION  ======================================================================
  *         Name:  readFromDatabase
  *  Description:  Assess that contracts can be read from the database
