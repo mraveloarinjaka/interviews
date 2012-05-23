@@ -141,9 +141,8 @@ int loadContract(void *pvContracts, int argc, char **argv, char **szColumNames)
 
 } // namespace
  
-Contract::Contract() : m_reference(0)
+Contract::Contract() : m_reference(0), m_source(""), m_party("")
 {
-   m_source[0] = 0;
 }
 
 double Contract::getReference() const
@@ -153,12 +152,12 @@ double Contract::getReference() const
 
 char const *Contract::getSource() const
 {
-   return m_source;
+   return m_source.c_str();
 }
 
 char const *Contract::getParty() const
 {
-   return m_party;
+   return m_party.c_str();
 }
 
 
@@ -173,12 +172,11 @@ Contract &Contract::setSource(char const *source)
 {
    if(source)
    {
-      strncpy(m_source, source, CONTRACT_SOURCE_LEN - 1);
-      m_source[CONTRACT_SOURCE_LEN - 1] = 0;
+      m_source = source;
    }
    else
    {
-      m_source[0] = 0;
+      m_source.erase();
    }
    return *this;
 }
@@ -187,12 +185,11 @@ Contract &Contract::setParty(char const *party)
 {
    if(party)
    {
-      strncpy(m_party, party, CONTRACT_PARTY_LEN - 1);
-      m_party[CONTRACT_PARTY_LEN - 1] = 0;
+      m_party = party;
    }
    else
    {
-      m_party[0] = 0;
+      m_party.erase();
    }
    return *this;
 }

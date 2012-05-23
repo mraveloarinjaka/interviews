@@ -14,6 +14,7 @@
 #include "contract.fwd.hpp"
 
 #include <iostream>
+#include <string>
 
 typedef struct sqlite3 sqlite3;
 
@@ -77,8 +78,8 @@ class Contract
 
    private:
       double m_reference;
-      char m_source[CONTRACT_SOURCE_LEN];
-      char m_party[CONTRACT_PARTY_LEN];
+      std::string m_source;
+      std::string m_party;
 };
 
 } } // tests::transaction
